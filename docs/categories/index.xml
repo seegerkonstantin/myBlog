@@ -6,7 +6,16 @@
     <description>Recent content in Categories on agis Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 20 Oct 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://seegerkonstantin.github.io/myBlog/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 05 Dec 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://seegerkonstantin.github.io/myBlog/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>aGIS</title>
+      <link>https://seegerkonstantin.github.io/myBlog/categories/agis/</link>
+      <pubDate>Sun, 05 Dec 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://seegerkonstantin.github.io/myBlog/categories/agis/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>cat1</title>
       <link>https://seegerkonstantin.github.io/myBlog/categories/cat1/</link>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>aGIS on agis Blog</title>
+    <link>https://seegerkonstantin.github.io/myBlog/categories/agis/</link>
+    <description>Recent content in aGIS on agis Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 05 Dec 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://seegerkonstantin.github.io/myBlog/categories/agis/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Assessment: Lidar forest indices</title>
+      <link>https://seegerkonstantin.github.io/myBlog/post/2021-12-05-assessment-lidar-forest-indices/</link>
+      <pubDate>Sun, 05 Dec 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://seegerkonstantin.github.io/myBlog/post/2021-12-05-assessment-lidar-forest-indices/</guid>
+      <description>Task Our research question is: Is it possible to derive a suitable set of predictor variables from LiDAR data to obtain a reliable prediction of the microclimate parameters temperature and humidity?
+The following Task had to be performed:
+ Read the ressources related to forest and identify those which you will use for attempting the task. Decide which algorithms and indices are adequate to answer the research question. Apply and document this findings with on base of the scripts of the this unit experiences.</description>
+    </item>
+    
+  </channel>
+</rss>

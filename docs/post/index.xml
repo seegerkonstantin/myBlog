@@ -6,7 +6,7 @@
     <description>Recent content in Posts on agis Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 20 Oct 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://seegerkonstantin.github.io/myBlog/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 05 Dec 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://seegerkonstantin.github.io/myBlog/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>About</title>
       <link>https://seegerkonstantin.github.io/myBlog/post/about/</link>
@@ -78,6 +78,17 @@ This is block math: $$ \varphi = 1+\frac{1} {1+\frac{1} {1+\frac{1} {1+\cdots} }
       <guid>https://seegerkonstantin.github.io/myBlog/post/mermaid-graphs/</guid>
       <description>Here’s a simple mermaid flowchart.
 library(DiagrammeR)## Warning: Paket &amp;#39;DiagrammeR&amp;#39; wurde unter R Version 4.1.2 erstelltDiagrammeR::mermaid(&amp;quot;graph LRA(Rounded)--&amp;gt;B[Rectangular]B--&amp;gt;C{A Rhombus}C--&amp;gt;D[Rectangle One]C--&amp;gt;E[Rectangle Two]&amp;quot;){&#34;x&#34;:{&#34;diagram&#34;:&#34;\ngraph LR\nA(Rounded)--B[Rectangular]\nB--C{A Rhombus}\nC--D[Rectangle One]\nC--E[Rectangle Two]\n&#34;},&#34;evals&#34;:[],&#34;jsHooks&#34;:[]}DiagrammeR::grViz(&amp;quot;digraph a_nice_graph {# node definitions with substituted label textnode [fontname = Helvetica]a [label = &amp;#39;@@1&amp;#39;]b [label = &amp;#39;@@2-1&amp;#39;]c [label = &amp;#39;@@2-2&amp;#39;]d [label = &amp;#39;@@2-3&amp;#39;]e [label = &amp;#39;@@2-4&amp;#39;]f [label = &amp;#39;@@2-5&amp;#39;]g [label = &amp;#39;@@2-6&amp;#39;]h [label = &amp;#39;@@2-7&amp;#39;]i [label = &amp;#39;@@2-8&amp;#39;]j [label = &amp;#39;@@2-9&amp;#39;]# edge definitions with the node IDsa -&amp;gt; {b c d e f g h i j}}[1]: &amp;#39;top&amp;#39;[2]: 10:15&amp;quot;){&#34;</description>
+    </item>
+    
+    <item>
+      <title>Assessment: Lidar forest indices</title>
+      <link>https://seegerkonstantin.github.io/myBlog/post/2021-12-05-assessment-lidar-forest-indices/</link>
+      <pubDate>Sun, 05 Dec 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://seegerkonstantin.github.io/myBlog/post/2021-12-05-assessment-lidar-forest-indices/</guid>
+      <description>Task Our research question is: Is it possible to derive a suitable set of predictor variables from LiDAR data to obtain a reliable prediction of the microclimate parameters temperature and humidity?
+The following Task had to be performed:
+ Read the ressources related to forest and identify those which you will use for attempting the task. Decide which algorithms and indices are adequate to answer the research question. Apply and document this findings with on base of the scripts of the this unit experiences.</description>
     </item>
     
     <item>

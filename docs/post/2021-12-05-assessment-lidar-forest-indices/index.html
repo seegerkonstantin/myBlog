@@ -15,15 +15,15 @@
     
 
     
-    <meta name="title" content="Course Two tagged with cat2 tag2" />
-    <meta property="og:title" content="Course Two tagged with cat2 tag2" />
-    <meta property="twitter:title" content="Course Two tagged with cat2 tag2" />
+    <meta name="title" content="Assessment: Lidar forest indices" />
+    <meta property="og:title" content="Assessment: Lidar forest indices" />
+    <meta property="twitter:title" content="Assessment: Lidar forest indices" />
     
 
     
-    <meta name="description" content="description">
-    <meta property="og:description" content="description" />
-    <meta property="twitter:description" content="description" />
+    <meta name="description" content="my description">
+    <meta property="og:description" content="my description" />
+    <meta property="twitter:description" content="my description" />
     
 
     
@@ -45,9 +45,9 @@
     <meta name="keyword"  content="my key words">
     <link rel="shortcut icon" href="/myBlog/img/favicon.ico">
 
-    <title>Course Two tagged with cat2 tag2-my Seotitle</title>
+    <title>Assessment: Lidar forest indices-my Seotitle</title>
 
-    <link rel="canonical" href="/myBlog/myBlog/post/2021-10-20-cat-2/">
+    <link rel="canonical" href="/myBlog/myBlog/post/2021-12-05-assessment-lidar-forest-indices/">
     
 
   <script src="https://unpkg.com/boxicons@2.0.9/dist/boxicons.js"></script>
@@ -179,7 +179,7 @@
 
 <style type="text/css">
     header.intro-header {
-        background-image: url('/myBlog/images/header-cat2.jpg');
+        background-image: url('/myBlog/img/home-header.jpg');
   max-height: 350px
     }
 </style>
@@ -191,7 +191,7 @@
             <div class="col-lg-0 col-lg-offset-0 col-md-0 col-md-offset-0">
                 <div class="post-heading">
                    
-                    <h1>Course Two tagged with cat2 tag2</h1>
+                    <h1>Assessment: Lidar forest indices</h1>
                    
             
                             
@@ -216,7 +216,53 @@
                 post-container">
 
                 
-                <h2 id="nothing-here-but-cat-2">Nothing here but cat 2</h2>
+                <h1 id="task">Task</h1>
+<p>Our research question is:
+Is it possible to derive a suitable set of predictor variables from LiDAR data to obtain a reliable prediction of the microclimate parameters temperature and humidity?</p>
+<p>The following Task had to be performed:</p>
+<ul>
+<li>Read the ressources related to forest and identify those which you will use for attempting the task.</li>
+<li>Decide which algorithms and indices are adequate to answer the research question.</li>
+<li>Apply and document this findings with on base of the scripts of the this unit experiences.</li>
+</ul>
+<p>To solve this task I read a few articles and selected &ldquo;Simulations of Leaf BSDF Effects on Lidar Waveforms&rdquo; (Roth et al. 2020).
+They described the calculation of the Leaf Area Index (LAI). I thought that it might be posible to predict temperature and humidity from the LAI. I did some research and I read that eg. Hardwick et al. (2014) found out that, if the LAI is high, humidity and temperature are low and if the LAI is low, humidity and temperature are high. This means you can not predict temperature and humidity exactly from the LAI but LAI is a predictor.</p>
+<p>Based on these findings we are trying to calculate the LAI onto our research area close to Marburg. Roth et al. (2010) described that he used the formula of Kamoske et al. (2019) to calculate the LAI. To calculate it Kamoske build a R-Packege called &ldquo;canopyLazR&rdquo; which I used for this assignment. The following code does describe the calculation of the LAI.</p>
+<p>We load our data. As the created array takes alot of memory and the loading takes some time I can not lower the &ldquo;voxel.resolution&rdquo; argument.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#6272a4"># Convert .laz or .las file into a voxelized lidar array</span>
+laz.data <span style="color:#ff79c6">&lt;-</span> <span style="color:#50fa7b">laz.to.array</span>(laz.file.path <span style="color:#ff79c6">=</span> <span style="color:#50fa7b">file.path</span>(envrmt<span style="color:#ff79c6">$</span>path_lidar_org,<span style="color:#f1fa8c">&#34;las_mof.las&#34;</span>), 
+                         voxel.resolution <span style="color:#ff79c6">=</span> <span style="color:#bd93f9">10</span>, 
+                         z.resolution <span style="color:#ff79c6">=</span> <span style="color:#bd93f9">1</span>,
+                         use.classified.returns <span style="color:#ff79c6">=</span> <span style="color:#ff79c6">TRUE</span>)
+
+<span style="color:#6272a4"># Level the voxelized array to mimic a canopy height model</span>
+level.canopy <span style="color:#ff79c6">&lt;-</span> <span style="color:#50fa7b">canopy.height.levelr</span>(lidar.array <span style="color:#ff79c6">=</span> laz.data)
+
+<span style="color:#6272a4"># Estimate Leaf Area Density (LAD) for each voxel in leveled array</span>
+lad.estimates <span style="color:#ff79c6">&lt;-</span> <span style="color:#50fa7b">machorn.lad</span>(leveld.lidar.array <span style="color:#ff79c6">=</span> level.canopy, 
+                             voxel.height <span style="color:#ff79c6">=</span> <span style="color:#bd93f9">1</span>, 
+                             beer.lambert.constant <span style="color:#ff79c6">=</span> <span style="color:#ff79c6">NULL</span>)
+
+<span style="color:#6272a4"># Convert the LAD array into a single raster stack</span>
+lad.raster <span style="color:#ff79c6">&lt;-</span> <span style="color:#50fa7b">lad.array.to.raster.stack</span>(lad.array <span style="color:#ff79c6">=</span> lad.estimates, 
+                                        laz.array <span style="color:#ff79c6">=</span> laz.data, 
+                                        epsg.code <span style="color:#ff79c6">=</span> <span style="color:#bd93f9">25832</span>)
+</code></pre></div><pre tabindex="0"><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj = prefer_proj): PROJ/GDAL PROJ string degradation in workflow
+##  repeated warnings suppressed
+##  Discarded datum European_Terrestrial_Reference_System_1989 in Proj4 definition
+</code></pre><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#6272a4"># Create a single LAI raster from the LAD raster stack</span>
+lai.raster <span style="color:#ff79c6">&lt;-</span> raster<span style="color:#ff79c6">::</span><span style="color:#50fa7b">calc</span>(lad.raster, fun <span style="color:#ff79c6">=</span> sum, na.rm <span style="color:#ff79c6">=</span> <span style="color:#ff79c6">TRUE</span>)
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#6272a4">#Plotting the LAI </span>
+<span style="color:#50fa7b">plot</span>(lai.raster)
+</code></pre></div><!-- raw HTML omitted -->
+<p>The LAI is in the western part of our research area the highest while in the east the LAI is the lowest. 
+This would mean that in the eastern part it can be expected that our temperature and humidity is higher than in west.</p>
+<h1 id="references">References</h1>
+<ul>
+<li>Hardwick, S.R., Toumi, R., Pfeifer, M., Turner, E.C., Nilius, R. &amp; R.M. Ewers (2014): The relationship between leaf area index and microclimate in tropical forest and oil palm plantation: Forest disturbance drives changes in microclimate. Agricultural and Forest Meteorology. 201. 187-195. <a href="https://doi.org/10.1016/j.agrformet.2014.11.010">https://doi.org/10.1016/j.agrformet.2014.11.010</a></li>
+<li>Kamoske, A.G. (2020): canopyLazR. <a href="https://github.com/akamoske/canopyLazR">https://github.com/akamoske/canopyLazR</a></li>
+<li>Roth, D.B., Goodenough, A.A.,Brown, S.D., van AArdt, J.A., Saunders, M.G. &amp; K. Krause (2020): Simulations of Leaf BSDF Effects on Lidar Waveforms. Remote Sensing. 12. 2909. <a href="https://doi.org/10.3390/rs12182909">https://doi.org/10.3390/rs12182909</a></li>
+</ul>
 
                 <style>
 .button {
@@ -289,7 +335,7 @@
         crossorigin="anonymous" 
         async>
 </script>
-<p>Due to an occasionally faulty page redirection, a 404 error may occur. please use the alternative <button class="button button1"> <a href="https://api.utteranc.es/authorize?redirect_uri=https%3a%2f%2fseegerkonstantin.github.io%2fmyBlog%2fpost%2f2021-10-20-cat-2%2f">Sign in with GitHub</a></button></p>
+<p>Due to an occasionally faulty page redirection, a 404 error may occur. please use the alternative <button class="button button1"> <a href="https://api.utteranc.es/authorize?redirect_uri=https%3a%2f%2fseegerkonstantin.github.io%2fmyBlog%2fpost%2f2021-12-05-assessment-lidar-forest-indices%2f">Sign in with GitHub</a></button></p>
     
 </div>
 
@@ -299,13 +345,13 @@
                 <ul class="pager">
                     
                     <li class="previous">
-                        <a href="/myBlog/post/markdown-syntax/" data-toggle="tooltip" data-placement="top" title="Markdown Syntax Guide">&larr;
+                        <a href="/myBlog/post/2020-12-01-r-rmarkdown/" data-toggle="tooltip" data-placement="top" title="Hello R Markdown">&larr;
                             Previous Post</a>
                     </li>
                     
                     
                     <li class="next">
-                        <a href="/myBlog/post/2021-10-20-cat-1/" data-toggle="tooltip" data-placement="top" title="Course one tagged with cat1 tag1">Next
+                        <a href="/myBlog/post/mermaid-graphs/" data-toggle="tooltip" data-placement="top" title="DiagrammeR Graphs">Next
                             Post &rarr;</a>
                     </li>
                     
