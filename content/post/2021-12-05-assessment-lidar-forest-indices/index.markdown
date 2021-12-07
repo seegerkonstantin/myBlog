@@ -4,7 +4,6 @@ subtitle:    ""
 description: ""
 date:        2021-12-05
 author:      "Konstantin Seeger"
-image:       ""
 categories: ["aGIS"]
 tags: ["task"]
 toc: true
@@ -12,6 +11,7 @@ output:
   blogdown::html_page:
     keep_md: yes
 weight: 100
+image: "/img/IMG-20190924-WA0117.jpg"
 ---
 
 
@@ -77,7 +77,7 @@ plot(lai.raster)
 <img src="{{< blogdown/postref >}}index_files/figure-html/lai-1.png" width="672" />
 
 
-
+![](images/lai-1.png)
 
 
 The LAI is in the western part of our research area the highest while in the east the LAI is the lowest. 

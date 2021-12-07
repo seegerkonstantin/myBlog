@@ -4,6 +4,7 @@ author: "Frida Gomam"
 date: 2020-12-01T21:13:14-05:00
 categories: ["R"]
 tags: ["R Markdown", "plot", "regression"]
+image: "/img/lai-1.png"
 ---
 
 ```{r setup, include=FALSE}
@@ -34,4 +35,7 @@ pie(
   col = c('#0292D8', '#F7EA39', '#C4B632'),
   init.angle = -50, border = NA
 )
+
 ```
+
+![](images/lai-1.png)
