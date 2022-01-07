@@ -225,47 +225,97 @@ Is it possible to derive a suitable set of predictor variables from LiDAR data t
 <li>Decide which algorithms and indices are adequate to answer the research question.</li>
 <li>Apply and document this findings with on base of the scripts of the this unit experiences.</li>
 </ul>
+<h1 id="possible-predictors">Possible Predictors</h1>
 <p>To solve this task I read a few articles and selected &ldquo;Simulations of Leaf BSDF Effects on Lidar Waveforms&rdquo; (Roth et al. 2020).
-They described the calculation of the Leaf Area Index (LAI). I thought that it might be posible to predict temperature and humidity from the LAI. I did some research and I read that eg. Hardwick et al. (2014) found out that, if the LAI is high, humidity and temperature are low and if the LAI is low, humidity and temperature are high. This means you can not predict temperature and humidity exactly from the LAI but LAI is a predictor.</p>
+They described the calculation of the Leaf Area Index (LAI). I thought that it might be posible to predict temperature and humidity from the LAI. I did some research and I read that eg. Hardwick et al. (2014) found out that, if the LAI is high, humidity and temperature are low and if the LAI is low, humidity and temperature are high.</p>
+<h2 id="lai">LAI</h2>
 <p>Based on these findings we are trying to calculate the LAI onto our research area close to Marburg. Roth et al. (2010) described that he used the formula of Kamoske et al. (2019) to calculate the LAI. To calculate it Kamoske build a R-Packege called &ldquo;canopyLazR&rdquo; which I used for this assignment. The following code does describe the calculation of the LAI.</p>
 <p>We load our data. As the created array takes alot of memory and the loading takes some time I can not lower the &ldquo;voxel.resolution&rdquo; argument.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#6272a4"># Convert .laz or .las file into a voxelized lidar array</span>
-laz.data <span style="color:#ff79c6">&lt;-</span> <span style="color:#50fa7b">laz.to.array</span>(laz.file.path <span style="color:#ff79c6">=</span> <span style="color:#50fa7b">file.path</span>(envrmt<span style="color:#ff79c6">$</span>path_lidar_org,<span style="color:#f1fa8c">&#34;las_mof.las&#34;</span>), 
-                         voxel.resolution <span style="color:#ff79c6">=</span> <span style="color:#bd93f9">10</span>, 
-                         z.resolution <span style="color:#ff79c6">=</span> <span style="color:#bd93f9">1</span>,
-                         use.classified.returns <span style="color:#ff79c6">=</span> <span style="color:#ff79c6">TRUE</span>)
+<span style="color:#6272a4">#laz.data &lt;- laz.to.array(laz.file.path = file.path(envrmt$path_lidar_org,&#34;las_mof.las&#34;), </span>
+ <span style="color:#6272a4">#                        voxel.resolution = 10, </span>
+  <span style="color:#6272a4">#                       z.resolution = 1,</span>
+   <span style="color:#6272a4">#                      use.classified.returns = TRUE)</span>
 
 <span style="color:#6272a4"># Level the voxelized array to mimic a canopy height model</span>
-level.canopy <span style="color:#ff79c6">&lt;-</span> <span style="color:#50fa7b">canopy.height.levelr</span>(lidar.array <span style="color:#ff79c6">=</span> laz.data)
+<span style="color:#6272a4">#level.canopy &lt;- canopy.height.levelr(lidar.array = laz.data)</span>
 
 <span style="color:#6272a4"># Estimate Leaf Area Density (LAD) for each voxel in leveled array</span>
-lad.estimates <span style="color:#ff79c6">&lt;-</span> <span style="color:#50fa7b">machorn.lad</span>(leveld.lidar.array <span style="color:#ff79c6">=</span> level.canopy, 
-                             voxel.height <span style="color:#ff79c6">=</span> <span style="color:#bd93f9">1</span>, 
-                             beer.lambert.constant <span style="color:#ff79c6">=</span> <span style="color:#ff79c6">NULL</span>)
+<span style="color:#6272a4">#lad.estimates &lt;- machorn.lad(leveld.lidar.array = level.canopy, </span>
+ <span style="color:#6272a4">#                            voxel.height = 1, </span>
+  <span style="color:#6272a4">#                           beer.lambert.constant = NULL)</span>
 
 <span style="color:#6272a4"># Convert the LAD array into a single raster stack</span>
-lad.raster <span style="color:#ff79c6">&lt;-</span> <span style="color:#50fa7b">lad.array.to.raster.stack</span>(lad.array <span style="color:#ff79c6">=</span> lad.estimates, 
-                                        laz.array <span style="color:#ff79c6">=</span> laz.data, 
-                                        epsg.code <span style="color:#ff79c6">=</span> <span style="color:#bd93f9">25832</span>)
-</code></pre></div><pre tabindex="0"><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj = prefer_proj): PROJ/GDAL PROJ string degradation in workflow
-##  repeated warnings suppressed
-##  Discarded datum European_Terrestrial_Reference_System_1989 in Proj4 definition
-</code></pre><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#6272a4"># Create a single LAI raster from the LAD raster stack</span>
-lai.raster <span style="color:#ff79c6">&lt;-</span> raster<span style="color:#ff79c6">::</span><span style="color:#50fa7b">calc</span>(lad.raster, fun <span style="color:#ff79c6">=</span> sum, na.rm <span style="color:#ff79c6">=</span> <span style="color:#ff79c6">TRUE</span>)
-</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#6272a4">#Plotting the LAI </span>
-<span style="color:#50fa7b">plot</span>(lai.raster)
-</code></pre></div><!-- raw HTML omitted -->
-<p>
-  <img src="images/lai-1.png" alt="">
+<span style="color:#6272a4">#lad.raster &lt;- lad.array.to.raster.stack(lad.array = lad.estimates, </span>
+ <span style="color:#6272a4">#                                       laz.array = laz.data, </span>
+  <span style="color:#6272a4">#                                      epsg.code = 25832)</span>
+
+
+<span style="color:#6272a4"># Create a single LAI raster from the LAD raster stack</span>
+<span style="color:#6272a4">#lai.raster &lt;- raster::calc(lad.raster, fun = sum, na.rm = TRUE)</span>
+</code></pre></div><p>
+  <img src="images/lai_1.png" alt="">
 
 </p>
 <p>The LAI is in the western part of our research area the highest while in the east the LAI is the lowest. 
 This would mean that in the eastern part it can be expected that our temperature and humidity is higher than in west.</p>
+<h2 id="lad">LAD</h2>
+<p>Another predictor could be the leaf area density (LAD) and the Shannon Index calculted from the LAD. Carrasco et al. (2019) found out that predictors calculated from the LAD show a better correlation that calculated from a regular height model (dgm). But because the LAD can not be calculated as an raster grid which is most likely the needed format for our predictors I will leave the LAD and the Shannon Index out until I find a solution to calculate them.</p>
+<h2 id="digital-elevation-model">Digital Elevation Model</h2>
+<p>An pretty simple indicator could be a digital elevation model (DGM). Temperatur increses with height by 0.98 K for every 100 meters (Bendix &amp; Lutherbacher 2019). Humidity on the other side decreses with higher elevation (Duane et al. 2008). The dgm and the rest of the predictors have been calculated with the lidR or the raster package (Hijmans 2018; Roussel 2021).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#6272a4">#dgm &lt;- grid_terrain(lidar_file, res = 1, algorithm = tin())</span>
+</code></pre></div><p>
+  <img src="images/dgm.png" alt="">
+
+</p>
+<p>The highest elevation can be found in the southwestern part of our study area.</p>
+<h2 id="slope--aspect">Slope &amp; Aspect</h2>
+<p>Calculated from the digital elevation model slope and aspect could be two other predictors.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#6272a4">#Slope</span>
+<span style="color:#6272a4">#slope &lt;- raster::terrain(dgm,opt=&#34;slope&#34;, unit=&#34;degrees&#34;)</span>
+
+<span style="color:#6272a4">#Aspect </span>
+<span style="color:#6272a4">#aspect &lt;- raster::terrain(dgm,opt = &#34;aspect&#34;,unit = &#34;degrees&#34;)</span>
+</code></pre></div><p>
+  <img src="images/Aspect.png" alt="">
+
+
+
+  <img src="images/Slope.png" alt="">
+
+</p>
+<h2 id="canopy-height-model">Canopy Height Model</h2>
+<p>A canopy height model (chm) is another potential predictor. A canopy height model has also been used in the study of Carrasco et al. (2019).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#6272a4">#chm = lidR::grid_canopy(norm_las, 0.25, pitfree(c(0,2,5,10,15), c(0,1), subcircle = 0.2))</span>
+</code></pre></div><p>
+  <img src="images/canopy_height_model_chm.png" alt="">
+
+</p>
+<h2 id="height-first-returns-standard-deviation">Height first returns standard deviation</h2>
+<p>The first returns of the height standard deviation had in the study of Carrasco et al. (2019) one of the highest correlations with temperature. Therefore it is a most use to predict temperature.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#6272a4">#first_return_sd &lt;- grid_metrics(lidar_file, func = ~sd(Z), res = 1, by_echo = &#34;first&#34;)</span>
+</code></pre></div><p>
+  <img src="images/First_returns_height_sd.png" alt="">
+
+</p>
+<h2 id="point-density">Point density</h2>
+<p>My last predictor is the point density. Point density is defined as the number of points within a pixel divided by the are of the pixel (m²) (Roussel et al. 2021). With higher density I would except a lower temperature and humidity with a increased point density similar to the LAI.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#6272a4">#density &lt;- grid_metrics(lidar_file, ~length(Z)/1, 1)</span>
+</code></pre></div><p>
+  <img src="images/Point_density.png" alt="">
+
+</p>
+<p>Obviously the dark stripes in the plot are not really looking natural and making me question if point density can be a reliable predictor.</p>
 <h1 id="references">References</h1>
 <ul>
+<li>Bendix J. &amp; J. Lutherbacher (2019): Klimatologie. 3. Auflage. Westermann. Braunschweig.</li>
+<li>Carrasco, L., Giam, X., Papes, M. &amp; K.S. Sheldon (2019): Metrics of Lidar-Derived 3D Vegetation Structure Reveal Contrasting Effects of Horizontal and Vertical Forest Heterogeneity on Bird Species Richness. Remote Sensing. 11. 743. <a href="https://doi:10.3390/rs11070743">https://doi:10.3390/rs11070743</a></li>
+<li>Duane, W.J., Pepin, N.C., Losleben, M.L. &amp; D.R. Hardy (2008): General Characteristics of Temperature and Humidity Variability on Kilimanjaro, Tanzania. Arctic, Antarctic, and Alpine Research. 40:2. 323-334. <a href="https://doi.org/10.1657/1523-0430(06-127)%5BDUANE%5D2.0.CO;2">https://doi.org/10.1657/1523-0430(06-127)[DUANE]2.0.CO;2</a></li>
 <li>Hardwick, S.R., Toumi, R., Pfeifer, M., Turner, E.C., Nilius, R. &amp; R.M. Ewers (2014): The relationship between leaf area index and microclimate in tropical forest and oil palm plantation: Forest disturbance drives changes in microclimate. Agricultural and Forest Meteorology. 201. 187-195. <a href="https://doi.org/10.1016/j.agrformet.2014.11.010">https://doi.org/10.1016/j.agrformet.2014.11.010</a></li>
 <li>Kamoske, A.G. (2020): canopyLazR. <a href="https://github.com/akamoske/canopyLazR">https://github.com/akamoske/canopyLazR</a></li>
+<li>Hijmans R.J. (2018): Spatial Data Science with R. <a href="https://rspatial.org/raster/index.html">https://rspatial.org/raster/index.html</a></li>
 <li>Roth, D.B., Goodenough, A.A.,Brown, S.D., van AArdt, J.A., Saunders, M.G. &amp; K. Krause (2020): Simulations of Leaf BSDF Effects on Lidar Waveforms. Remote Sensing. 12. 2909. <a href="https://doi.org/10.3390/rs12182909">https://doi.org/10.3390/rs12182909</a></li>
+<li>Roussel, J.R., Goodbody, T.R.H. &amp; P. Tompalski (2021): The lidR package. <a href="https://jean-romain.github.io/lidRbook/index.html">https://jean-romain.github.io/lidRbook/index.html</a></li>
 </ul>
 
                 <style>
@@ -474,7 +524,7 @@ This would mean that in the eastern part it can be expected that our temperature
             
                 </ul>
 		<p class="copyright text-muted">
-                    Copyright &copy; agis Blog 2021
+                    Copyright &copy; agis Blog 2022
                     <br>
                     <a href="https://themes.gohugo.io/hugo-theme-cleanwhite">CleanWhite Hugo Theme</a> by <a href="https://zhaohuabing.com">Huabing</a> 
                 </p>

@@ -77,7 +77,7 @@ plot(lai.raster)
 <img src="index_files/figure-html/lai-1.png" width="672" />
 
 
-![](images/lai-1.png)
+![](images/lai-1.png)  
 
 
 The LAI is in the western part of our research area the highest while in the east the LAI is the lowest. 
