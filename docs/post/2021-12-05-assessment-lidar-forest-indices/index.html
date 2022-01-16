@@ -226,11 +226,10 @@ Is it possible to derive a suitable set of predictor variables from LiDAR data t
 <li>Apply and document this findings with on base of the scripts of the this unit experiences.</li>
 </ul>
 <h1 id="possible-predictors">Possible Predictors</h1>
+<h2 id="lai">LAI</h2>
 <p>To solve this task I read a few articles and selected &ldquo;Simulations of Leaf BSDF Effects on Lidar Waveforms&rdquo; (Roth et al. 2020).
 They described the calculation of the Leaf Area Index (LAI). I thought that it might be posible to predict temperature and humidity from the LAI. I did some research and I read that eg. Hardwick et al. (2014) found out that, if the LAI is high, humidity and temperature are low and if the LAI is low, humidity and temperature are high.</p>
-<h2 id="lai">LAI</h2>
 <p>Based on these findings we are trying to calculate the LAI onto our research area close to Marburg. Roth et al. (2010) described that he used the formula of Kamoske et al. (2019) to calculate the LAI. To calculate it Kamoske build a R-Packege called &ldquo;canopyLazR&rdquo; which I used for this assignment. The following code does describe the calculation of the LAI.</p>
-<p>We load our data. As the created array takes alot of memory and the loading takes some time I can not lower the &ldquo;voxel.resolution&rdquo; argument.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#6272a4"># Convert .laz or .las file into a voxelized lidar array</span>
 <span style="color:#6272a4">#laz.data &lt;- laz.to.array(laz.file.path = file.path(envrmt$path_lidar_org,&#34;las_mof.las&#34;), </span>
  <span style="color:#6272a4">#                        voxel.resolution = 10, </span>
@@ -257,25 +256,25 @@ They described the calculation of the Leaf Area Index (LAI). I thought that it m
   <img src="images/lai_1.png" alt="">
 
 </p>
-<p>The LAI is in the western part of our research area the highest while in the east the LAI is the lowest. 
-This would mean that in the eastern part it can be expected that our temperature and humidity is higher than in west.</p>
-<h2 id="lad">LAD</h2>
-<p>Another predictor could be the leaf area density (LAD) and the Shannon Index calculted from the LAD. Carrasco et al. (2019) found out that predictors calculated from the LAD show a better correlation that calculated from a regular height model (dgm). But because the LAD can not be calculated as an raster grid which is most likely the needed format for our predictors I will leave the LAD and the Shannon Index out until I find a solution to calculate them.</p>
+<p>It is visibly that the LAI has the value zero at few areas that are in the east. These are most likely open areas. Higher values up to five occur at a few points in all directions of the research area.</p>
 <h2 id="digital-elevation-model">Digital Elevation Model</h2>
 <p>An pretty simple indicator could be a digital elevation model (DGM). Temperatur increses with height by 0.98 K for every 100 meters (Bendix &amp; Lutherbacher 2019). Humidity on the other side decreses with higher elevation (Duane et al. 2008). The dgm and the rest of the predictors have been calculated with the lidR or the raster package (Hijmans 2018; Roussel 2021).</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#6272a4">#dgm &lt;- grid_terrain(lidar_file, res = 1, algorithm = tin())</span>
 </code></pre></div><p>
-  <img src="images/dgm.png" alt="">
+  <img src="images/dgm2.png" alt="">
 
 </p>
-<p>The highest elevation can be found in the southwestern part of our study area.</p>
-<h2 id="slope--aspect">Slope &amp; Aspect</h2>
-<p>Calculated from the digital elevation model slope and aspect could be two other predictors.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#6272a4">#Slope</span>
+<p>The highest elevation can be found in the southwestern part of our research area. In the north-west the elevation is the lowest.</p>
+<h2 id="slope-aspect-topographic-postion-index-tpi">Slope, Aspect, Topographic postion index (TPI)</h2>
+<p>Calculated from the digital elevation model slope, aspect and the TPI could be three other predictors.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#6272a4"># Slope</span>
 <span style="color:#6272a4">#slope &lt;- raster::terrain(dgm,opt=&#34;slope&#34;, unit=&#34;degrees&#34;)</span>
 
-<span style="color:#6272a4">#Aspect </span>
+<span style="color:#6272a4"># Aspect </span>
 <span style="color:#6272a4">#aspect &lt;- raster::terrain(dgm,opt = &#34;aspect&#34;,unit = &#34;degrees&#34;)</span>
+
+<span style="color:#6272a4"># TPI</span>
+<span style="color:#6272a4">#tpi &lt;- raster::terrain(dgm,opt = &#34;TPI&#34;)</span>
 </code></pre></div><p>
   <img src="images/Aspect.png" alt="">
 
@@ -283,23 +282,28 @@ This would mean that in the eastern part it can be expected that our temperature
 
   <img src="images/Slope.png" alt="">
 
+
+
+  <img src="images/TPI2.png" alt="">
+
 </p>
 <h2 id="canopy-height-model">Canopy Height Model</h2>
 <p>A canopy height model (chm) is another potential predictor. A canopy height model has also been used in the study of Carrasco et al. (2019).</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#6272a4">#chm = lidR::grid_canopy(norm_las, 0.25, pitfree(c(0,2,5,10,15), c(0,1), subcircle = 0.2))</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#6272a4">#chm = lidR::grid_canopy(norm_las, 1, pitfree(c(0,2,5,10,15), c(0,1), subcircle = 0.2))</span>
 </code></pre></div><p>
-  <img src="images/canopy_height_model_chm.png" alt="">
+  <img src="images/canopy_height_model_chm2.png" alt="">
 
 </p>
 <h2 id="height-first-returns-standard-deviation">Height first returns standard deviation</h2>
-<p>The first returns of the height standard deviation had in the study of Carrasco et al. (2019) one of the highest correlations with temperature. Therefore it is a most use to predict temperature.</p>
+<p>The first returns of the height standard deviation had in the study of Carrasco et al. (2019) one of the highest correlations with temperature. Therefore it is a must use to predict temperature. Additionally you could also use the maximum and mean height first returns but I expect them to be very similar to the canopy height model itself.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#6272a4">#first_return_sd &lt;- grid_metrics(lidar_file, func = ~sd(Z), res = 1, by_echo = &#34;first&#34;)</span>
 </code></pre></div><p>
-  <img src="images/First_returns_height_sd.png" alt="">
+  <img src="images/First_returns_height_sd2.png" alt="">
 
 </p>
 <h2 id="point-density">Point density</h2>
-<p>My last predictor is the point density. Point density is defined as the number of points within a pixel divided by the are of the pixel (m²) (Roussel et al. 2021). With higher density I would except a lower temperature and humidity with a increased point density similar to the LAI.</p>
+<p>My last predictor is the point density. Point density is defined as the number of points within a pixel divided by the are of the pixel (m²) (Roussel et al. 2021). 
+With higher forest density radiation can&rsquo;t get through the canopy which leads to lower temperatures compared to the areas that solar radiation can reach (Boehnke 2021 &amp; Arx et al. 2012). In the study from Arx et al. (2012) they also found out that density lead to an increased humidity.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#6272a4">#density &lt;- grid_metrics(lidar_file, ~length(Z)/1, 1)</span>
 </code></pre></div><p>
   <img src="images/Point_density.png" alt="">
@@ -308,7 +312,9 @@ This would mean that in the eastern part it can be expected that our temperature
 <p>Obviously the dark stripes in the plot are not really looking natural and making me question if point density can be a reliable predictor.</p>
 <h1 id="references">References</h1>
 <ul>
+<li>Arx, v.G., Dobbertin, M. &amp; M.  Rebetez (2012): Spatio-temporal effects of forest canopy on understory microclimate in a long-term experiment in Switzerland. Agricultural and Forest Meteorology. 166-167. 144-155. <a href="https://doi.org/10.1016/j.agrformet.2012.07.018">https://doi.org/10.1016/j.agrformet.2012.07.018</a></li>
 <li>Bendix J. &amp; J. Lutherbacher (2019): Klimatologie. 3. Auflage. Westermann. Braunschweig.</li>
+<li>Boehnke D. (2021): Exploring the Thermal Microcosms at the Forest Floor—A Case Study of a Temperate Forest. Atmosphere. 12. 503. <a href="https://doi.org/10.3390/atmos12040503">https://doi.org/10.3390/atmos12040503</a></li>
 <li>Carrasco, L., Giam, X., Papes, M. &amp; K.S. Sheldon (2019): Metrics of Lidar-Derived 3D Vegetation Structure Reveal Contrasting Effects of Horizontal and Vertical Forest Heterogeneity on Bird Species Richness. Remote Sensing. 11. 743. <a href="https://doi:10.3390/rs11070743">https://doi:10.3390/rs11070743</a></li>
 <li>Duane, W.J., Pepin, N.C., Losleben, M.L. &amp; D.R. Hardy (2008): General Characteristics of Temperature and Humidity Variability on Kilimanjaro, Tanzania. Arctic, Antarctic, and Alpine Research. 40:2. 323-334. <a href="https://doi.org/10.1657/1523-0430(06-127)%5BDUANE%5D2.0.CO;2">https://doi.org/10.1657/1523-0430(06-127)[DUANE]2.0.CO;2</a></li>
 <li>Hardwick, S.R., Toumi, R., Pfeifer, M., Turner, E.C., Nilius, R. &amp; R.M. Ewers (2014): The relationship between leaf area index and microclimate in tropical forest and oil palm plantation: Forest disturbance drives changes in microclimate. Agricultural and Forest Meteorology. 201. 187-195. <a href="https://doi.org/10.1016/j.agrformet.2014.11.010">https://doi.org/10.1016/j.agrformet.2014.11.010</a></li>
